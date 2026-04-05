@@ -759,7 +759,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
 
 [![Star on GitHub](https://img.shields.io/github/stars/DarshanPaapani/aura?style=social)](https://github.com/DarshanPaapani/aura)
 &nbsp;
-[![Follow DarshanPaapani](https://img.shields.io/github/followers/DarshanPaapani?style=social&label=Follow%20DarshanPaapani)](https://github.com/DarshanPaapani)
+[![Follow DarshanPaapani](https://img.shields.io/github/followers/Darshan-paapani06?style=social&label=Follow%20DarshanPaapani)](https://github.com/DarshanPaapani)
 
 <br/>
 
