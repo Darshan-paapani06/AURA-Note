@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AURA · Your Journal</title>
+  <link rel="stylesheet" href="css/global.css"/>
+  <link rel="stylesheet" href="css/app.css"/>
+  <style>
+    /* ── User dropdown ── */
+    .user-pill{position:relative;cursor:pointer}
+    .user-dropdown{
+      position:absolute;top:calc(100% + 10px);right:0;
+      background:var(--bg);border-radius:var(--rs);
+      box-shadow:var(--shadow);padding:8px;
+      min-width:200px;z-index:500;
+      opacity:0;pointer-events:none;transform:translateY(-8px);
+      transition:opacity .22s,transform .22s;
+    }
+    .user-dropdown.open{opacity:1;pointer-events:all;transform:translateY(0)}
+    .ud-header{padding:12px 14px 10px;border-bottom:1px solid rgba(181,201,213,.3);margin-bottom:6px}
+    .ud-name {font-weight:800;font-size:.9rem;color:var(--text)}
+    .ud-email{font-size:.73rem;color:var(--muted);margin-top:2px}
+    .ud-item{
+      display:flex;align-items:center;gap:10px;
+      padding:9px 14px;border-radius:10px;cursor:pointer;
+      font-size:.84rem;font-weight:700;color:var(--muted);
+      transition:background .15s,color .15s;border:none;background:none;
+      width:100%;font-family:inherit;
+    }
+    .ud-item:hover{background:rgba(26,184,212,.08);color:var(--text)}
+    .ud-item svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0}
+    .ud-item.danger{color:#e05c5c}
+    .ud-item.danger:hover{background:rgba(224,92,92,.08);color:#c43c3c}
+    .ud-divider{height:1px;background:rgba(181,201,213,.3);margin:6px 0}
+
+    /* ── Editor rich text area ── */
+    .rich-editor{
+      flex:1;min-height:220px;
+      border:none;background:transparent;
+      font-size:.93rem;color:var(--text);
+      outline:none;line-height:1.85;
+      overflow-y:auto;word-break:break-word;
+      white-space:pre-wrap;
+    }
+    .rich-editor:empty::before{
+      content:attr(data-placeholder);
+      color:#adc5d0;pointer-events:none;
+    }
+    .rich-editor:focus{outline:none}
+
+    /* ── Toolbar button active state ── */
+    .tb.active{box-shadow:var(--inset);color:var(--accent2)}
+
+    /* ── Mood button selected ── */
+    .mp{cursor:pointer;user-select:none}
+    .mp.on{box-shadow:var(--inset) !important;transform:scale(.95)}
+
+    /* ── Entry cards no seed ── */
+    .empty-state{
+      grid-column:1/-1;text-align:center;
+      padding:60px 20px;color:var(--muted);
+    }
+    .empty-state .big{font-size:3.5rem;margin-bottom:14px;display:block}
+    .empty-state p{font-size:.9rem;line-height:1.7}
+
+    /* ── Stat live update flash ── */
+    @keyframes statFlash{0%{transform:scale(1.15);color:var(--accent)}100%{transform:scale(1);color:var(--accent2)}}
+    .stat-num.flash{animation:statFlash .4s ease}
+  </style>
+</head>
+<body>
+<div id="ptx"></div>
+
+<div class="shell">
+
+  <!-- ══ TOPBAR ══ -->
+  <header class="topbar">
+    <div class="brand">AURA</div>
+    <nav class="top-tabs">
+      <button class="tab-pill on" data-tab="home">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home
+      </button>
+      <button class="tab-pill" data-tab="calendar">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Calendar
+      </button>
+      <button class="tab-pill" data-tab="mood">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>Moods
+      </button>
+      <button class="tab-pill" data-tab="search">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Search
+      </button>
+      <button class="tab-pill" data-tab="settings">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>Settings
+      </button>
+    </nav>
+    <div class="top-right">
+      <button class="icon-btn" id="newBtn" title="New Entry">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+      <!-- User pill with dropdown -->
+      <div class="user-pill" id="userPill">
+        <div class="uav" id="topAv">A</div>
+        <span class="uname" id="topName">Aura</span>
+        <!-- dropdown -->
+        <div class="user-dropdown" id="userDropdown">
+          <div class="ud-header">
+            <div class="ud-name" id="ddName">Aura User</div>
+            <div class="ud-email" id="ddEmail">user@aura.app</div>
+          </div>
+          <button class="ud-item" id="ddNewEntry">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New Entry
+          </button>
+          <button class="ud-item" id="ddSettings">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>Settings
+          </button>
+          <button class="ud-item" id="ddExport">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export Journal
+          </button>
+          <div class="ud-divider"></div>
+          <button class="ud-item danger" id="ddLogout">
+            <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ══ SIDENAV ══ -->
+  <nav class="sidenav">
+    <button class="snav on" data-tab="home"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span class="snav-tip">Home</span></button>
+    <button class="snav" data-tab="calendar"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span class="snav-tip">Calendar</span></button>
+    <button class="snav" data-tab="mood"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg><span class="snav-tip">Moods</span></button>
+    <div class="sdivider"></div>
+    <button class="snav" data-tab="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><span class="snav-tip">Search</span></button>
+    <div class="sdivider"></div>
+    <button class="snav" data-tab="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg><span class="snav-tip">Settings</span></button>
+  </nav>
+
+  <!-- ══ MAIN ══ -->
+  <main class="main" id="mainArea">
+
+    <!-- HOME -->
+    <section class="view on" id="tab-home">
+      <div class="cta" id="ctaBanner">
+        <div>
+          <h2 id="ctaGreet">Good morning ✨</h2>
+          <p>Your journal is waiting. Every entry is a piece of you.</p>
+        </div>
+        <button class="btn btn-ghost" id="ctaNewBtn">+ NEW ENTRY</button>
+      </div>
+      <div class="sec-title">Your Journey <span class="badge" id="monthBadge"></span></div>
+      <div class="stats">
+        <div class="stat"><div class="stat-ico">📝</div><div class="stat-num" id="stE">0</div><div class="stat-lbl">Entries</div></div>
+        <div class="stat"><div class="stat-ico">✍️</div><div class="stat-num" id="stW">0</div><div class="stat-lbl">Words Written</div></div>
+        <div class="stat"><div class="stat-ico">🔥</div><div class="stat-num" id="stS">0</div><div class="stat-lbl">Day Streak</div></div>
+        <div class="stat"><div class="stat-ico" id="stMI">😊</div><div class="stat-num" style="font-size:.88rem;padding-top:4px" id="stML">—</div><div class="stat-lbl">Top Mood</div></div>
+      </div>
+      <div class="sec-title">Your Entries</div>
+      <div class="filter-bar" id="filterBar">
+        <button class="fb on" data-f="all">🗂 All</button>
+        <button class="fb" data-f="😊">😊 Happy</button>
+        <button class="fb" data-f="😌">😌 Calm</button>
+        <button class="fb" data-f="🔥">🔥 Fired up</button>
+        <button class="fb" data-f="🌧">🌧 Sad</button>
+        <button class="fb" data-f="😴">😴 Tired</button>
+        <button class="fb" data-f="🤩">🤩 Excited</button>
+      </div>
+      <div class="cards" id="homeCards"></div>
+      <div style="height:32px"></div>
+      <button class="btn btn-grad" id="newBtn2" style="margin:0 auto;display:flex;gap:7px">
+        <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>NEW ENTRY
+      </button>
+      <div style="height:40px"></div>
+    </section>
+
+    <!-- CALENDAR -->
+    <section class="view" id="tab-calendar">
+      <div class="cal-hd">
+        <div class="cal-nav">
+          <button class="cal-nav-btn" id="calPrev">‹</button>
+          <h2 class="cal-ttl" id="calTitle">April 2026</h2>
+          <button class="cal-nav-btn" id="calNext">›</button>
+        </div>
+        <button class="btn" id="calNewBtn">+ New Entry</button>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+      <div id="calDay"></div>
+      <div style="height:40px"></div>
+    </section>
+
+    <!-- MOOD -->
+    <section class="view" id="tab-mood">
+      <div class="sec-title">Mood Tracker 🌈</div>
+      <div class="mood-grid">
+        <div class="mood-card"><h3>📊 Mood Breakdown</h3><div id="moodBars"></div></div>
+        <div class="mood-card"><h3>📅 Recent Log</h3><div id="moodLog"></div></div>
+      </div>
+      <div class="sec-title">Log your mood right now</div>
+      <div class="qm-strip">
+        <button class="qm" onclick="quickMood('😊')">😊 Happy</button>
+        <button class="qm" onclick="quickMood('😌')">😌 Calm</button>
+        <button class="qm" onclick="quickMood('🔥')">🔥 Fired up</button>
+        <button class="qm" onclick="quickMood('🌧')">🌧 Low</button>
+        <button class="qm" onclick="quickMood('😴')">😴 Tired</button>
+        <button class="qm" onclick="quickMood('🤩')">🤩 Excited</button>
+      </div>
+      <div style="height:40px"></div>
+    </section>
+
+    <!-- SEARCH -->
+    <section class="view" id="tab-search">
+      <div class="sec-title">Search Entries 🔍</div>
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input class="search-inp" id="searchInp" type="text" placeholder="Search title, content, mood, tag…"/>
+      </div>
+      <div class="cards" id="searchCards"></div>
+      <div class="empty-state hidden" id="searchEmpty">
+        <span class="big">🌊</span><p>No entries found.<br>Try a different keyword.</p>
+      </div>
+      <div style="height:40px"></div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="view" id="tab-settings">
+      <div class="sec-title">Settings ⚙️</div>
+      <div class="set-wrap">
+        <div class="set-card">
+          <h3>👤 Profile</h3>
+          <div class="profile-hero">
+            <div class="pav-lg" id="pavLg">A</div>
+            <div><div class="pname" id="pName">Aura User</div><div class="pemail" id="pEmail">user@aura.app</div></div>
+          </div>
+          <div class="set-row">
+            <div><div class="set-lbl">Display Name</div><div class="set-sub">How AURA greets you</div></div>
+            <input class="set-inp" id="dispName" type="text" placeholder="Your name"/>
+          </div>
+          <div class="set-row" style="margin-top:8px">
+            <div></div>
+            <button class="btn" id="saveNameBtn" style="padding:8px 18px">SAVE</button>
+          </div>
+        </div>
+        <div class="set-card">
+          <h3>🎨 Preferences</h3>
+          <div class="set-row">
+            <div><div class="set-lbl">Particle Animations</div><div class="set-sub">Floating background bubbles</div></div>
+            <label class="tog"><input type="checkbox" id="togPart" checked/><span class="tog-track"></span></label>
+          </div>
+          <div class="set-row">
+            <div><div class="set-lbl">Live Word Count</div><div class="set-sub">Show while writing</div></div>
+            <label class="tog"><input type="checkbox" id="togWC" checked/><span class="tog-track"></span></label>
+          </div>
+          <div class="set-row">
+            <div><div class="set-lbl">Writing Prompts</div><div class="set-sub">💡 button in editor</div></div>
+            <label class="tog"><input type="checkbox" id="togPr" checked/><span class="tog-track"></span></label>
+          </div>
+        </div>
+        <div class="set-card">
+          <h3>📦 Data</h3>
+          <div class="set-row">
+            <div><div class="set-lbl">Export All Entries</div><div class="set-sub">Download as JSON</div></div>
+            <button class="btn" id="exportBtn">EXPORT</button>
+          </div>
+          <div class="set-row">
+            <div><div class="set-lbl">Clear All Entries</div><div class="set-sub">Cannot be undone</div></div>
+            <button class="btn btn-danger" id="clearBtn">CLEAR ALL</button>
+          </div>
+        </div>
+        <div class="set-card">
+          <h3>🔑 Account</h3>
+          <div class="set-row">
+            <div><div class="set-lbl">Sign Out</div><div class="set-sub">See you next time 🌸</div></div>
+            <button class="btn btn-danger" id="signOutBtn">SIGN OUT</button>
+          </div>
+        </div>
+      </div>
+      <div style="height:40px"></div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ══ EDITOR MODAL ══ -->
+<div class="modal-bg" id="edModal">
+  <div class="ed-modal">
+    <div class="ed-top">
+      <h2 id="edTitle">New Entry</h2>
+      <div class="ed-acts">
+        <button class="btn btn-danger" id="edDelBtn" style="padding:8px 16px;font-size:.78rem;display:none">🗑 Delete</button>
+        <button class="btn btn-ghost" id="edCloseBtn">✕ Close</button>
+        <button class="btn" id="edSaveBtn" style="background:#fff;color:var(--accent2)">💾 Save</button>
+      </div>
+    </div>
+    <div class="ed-body">
+
+      <!-- Meta sidebar -->
+      <div class="ed-meta">
+        <div class="meta-date">
+          <div class="dn" id="edDay">01</div>
+          <div class="dl" id="edMon">APRIL 2026</div>
+        </div>
+
+        <div>
+          <div class="meta-lbl">Mood — tap to select</div>
+          <div class="mood-picker" id="moodPicker">
+            <button class="mp on" data-m="😊" type="button">😊</button>
+            <button class="mp" data-m="😌" type="button">😌</button>
+            <button class="mp" data-m="🔥" type="button">🔥</button>
+            <button class="mp" data-m="🌧" type="button">🌧</button>
+            <button class="mp" data-m="😴" type="button">😴</button>
+            <button class="mp" data-m="🤩" type="button">🤩</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="meta-lbl">Tags</div>
+          <div class="chips-row" id="tagChips">
+            <span class="chip on" data-t="Personal">Personal</span>
+            <span class="chip" data-t="Work">Work</span>
+            <span class="chip" data-t="Gratitude">Gratitude</span>
+            <span class="chip" data-t="Dreams">Dreams</span>
+            <span class="chip" data-t="Goals">Goals</span>
+            <span class="chip" data-t="Travel">Travel</span>
+          </div>
+        </div>
+
+        <div>
+          <div class="meta-lbl">Weather</div>
+          <div class="chips-row" id="wxChips">
+            <span class="chip on" data-t="☀️ Sunny">☀️</span>
+            <span class="chip" data-t="🌧 Rainy">🌧</span>
+            <span class="chip" data-t="🌤 Cloudy">🌤</span>
+            <span class="chip" data-t="❄️ Cold">❄️</span>
+          </div>
+        </div>
+
+        <!-- Word count in meta -->
+        <div id="wcDisplay" style="margin-top:auto;font-size:.72rem;color:var(--muted);text-align:center;padding-top:8px">0 words</div>
+      </div>
+
+      <!-- Writing area -->
+      <div class="ed-write">
+        <input class="title-inp" id="edEntTitle" type="text" placeholder="Give your entry a title…"/>
+
+        <!-- Rich text toolbar -->
+        <div class="toolbar" id="edToolbar">
+          <button class="tb" data-cmd="bold"        type="button" title="Bold (Ctrl+B)"><b>B</b></button>
+          <button class="tb" data-cmd="italic"      type="button" title="Italic (Ctrl+I)"><i>I</i></button>
+          <button class="tb" data-cmd="underline"   type="button" title="Underline (Ctrl+U)"><u>U</u></button>
+          <button class="tb" data-cmd="strikeThrough" type="button" title="Strikethrough"><s>S</s></button>
+          <span style="width:1px;height:20px;background:var(--sd);opacity:.5;margin:0 4px;align-self:center"></span>
+          <button class="tb" data-cmd="insertUnorderedList" type="button" title="Bullet list">
+            <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          </button>
+          <button class="tb" data-cmd="insertOrderedList" type="button" title="Numbered list">
+            <svg viewBox="0 0 24 24"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+          </button>
+          <button class="tb" data-cmd="formatBlock" data-val="blockquote" type="button" title="Quote">
+            <svg viewBox="0 0 24 24"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/></svg>
+          </button>
+          <span style="width:1px;height:20px;background:var(--sd);opacity:.5;margin:0 4px;align-self:center"></span>
+          <!-- Font size -->
+          <select id="fontSizeSelect" class="tb" style="width:auto;padding:0 6px;font-size:.78rem;color:var(--text);cursor:pointer" title="Font size">
+            <option value="1">Small</option>
+            <option value="3" selected>Normal</option>
+            <option value="5">Large</option>
+            <option value="7">Huge</option>
+          </select>
+          <!-- Text colour -->
+          <button class="tb" id="colorBtn" type="button" title="Text colour" style="position:relative">
+            <svg viewBox="0 0 24 24"><path d="M9 3l-6 18h3l1.5-4.5h9L18 21h3L15 3z"/><line x1="6.75" y1="13.5" x2="17.25" y2="13.5"/></svg>
+            <input type="color" id="colorPicker" style="position:absolute;opacity:0;width:100%;height:100%;top:0;left:0;cursor:pointer"/>
+          </button>
+          <span style="width:1px;height:20px;background:var(--sd);opacity:.5;margin:0 4px;align-self:center"></span>
+          <button class="tb" id="promptBtn" type="button" title="Writing Prompt 💡">💡</button>
+          <button class="tb" data-cmd="removeFormat" type="button" title="Clear formatting">
+            <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="3" y2="6"/><path d="M6 4h14"/><path d="M14 4l-4 16"/><line x1="6" y1="20" x2="14" y2="20"/><line x1="21" y1="3" x2="3" y2="21" stroke="#e05c5c"/></svg>
+          </button>
+        </div>
+
+        <!-- contenteditable rich text area -->
+        <div class="rich-editor"
+             id="edEntBody"
+             contenteditable="true"
+             data-placeholder="Pour your thoughts here… What made today special? What are you grateful for?"
+             spellcheck="true">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="aura-toast"></div>
+
+<script>
+'use strict';
+/* ══════════════════════════════════════════════════════════
+   AURA APP  · index.html
+   Fixes:
+   1. No seeded data — real entries only
+   2. Mood picker selection works (event delegation + .on class)
+   3. Rich text editor — bold/italic/underline/lists/size/colour all working
+   4. User pill opens dropdown with profile, settings, export, sign out
+══════════════════════════════════════════════════════════ */
+
+// ── Auth guard ────────────────────────────────────────────
+const _raw = localStorage.getItem('aura_user_v1');
+if(!_raw){
+  sessionStorage.setItem('_aura_loop','1');
+  window.location.replace('auth.html');
+}
+const USER = _raw ? JSON.parse(_raw) : null;
+
+// ── Particles ─────────────────────────────────────────────
+(function(){
+  const p=_getPrefs(); if(!p.particles) return;
+  const c=document.getElementById('ptx');
+  const cols=['#3ecfdf','#1a9fb8','#5ad8e8','#1488CC','#a8dff0'];
+  for(let i=0;i<22;i++){
+    const d=document.createElement('div');d.className='pt';
+    const s=14+Math.random()*54;
+    d.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}%;background:${cols[0|Math.random()*cols.length]};animation-duration:${9+Math.random()*14}s;animation-delay:${Math.random()*14}s`;
+    c.appendChild(d);
+  }
+})();
+
+// ── Toast ──────────────────────────────────────────────────
+let _tt;
+function toast(m){
+  const el=document.getElementById('aura-toast');
+  el.textContent=m;el.classList.add('show');
+  clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('show'),2800);
+}
+
+// ── Data ───────────────────────────────────────────────────
+const EK='aura_entries_v4', PK='aura_prefs_v1';
+
+function _getEntries(){
+  try{const r=localStorage.getItem(EK);return r?JSON.parse(r):[];}catch{return[];}
+}
+function _saveEntries(a){try{localStorage.setItem(EK,JSON.stringify(a));}catch{}}
+function _getPrefs(){
+  const def={particles:true,wordCount:true,prompts:true};
+  try{const r=localStorage.getItem(PK);return r?{...def,...JSON.parse(r)}:def;}catch{return def;}
+}
+function _savePref(k,v){const p=_getPrefs();p[k]=v;try{localStorage.setItem(PK,JSON.stringify(p));}catch{}}
+
+function saveEnt(e){
+  const a=_getEntries();const i=a.findIndex(x=>x.id===e.id);
+  if(i>-1)a[i]=e;else a.unshift(e);
+  _saveEntries(a);return a;
+}
+function delEnt(id){const a=_getEntries().filter(x=>x.id!==id);_saveEntries(a);return a;}
+
+// ── Helpers ───────────────────────────────────────────────
+function fmtDate(ds){
+  if(!ds)return'';
+  const d=new Date(ds+'T00:00:00');
+  return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+}
+function todayISO(){return new Date().toISOString().split('T')[0];}
+function nowTime(){return new Date().toLocaleTimeString('en',{hour:'2-digit',minute:'2-digit',hour12:false});}
+function textContent(el){return el?el.innerText||el.textContent||'':(el+'');}
+function wordCount(s){const t=s.replace(/<[^>]+>/g,' ').trim();return t?t.split(/\s+/).filter(Boolean).length:0;}
+
+// ── Init user UI ──────────────────────────────────────────
+if(USER){
+  const av=USER.name?USER.name[0].toUpperCase():'A';
+  document.getElementById('topAv').textContent=av;
+  document.getElementById('topName').textContent=USER.name?USER.name.split(' ')[0]:'Aura';
+  document.getElementById('pavLg').textContent=av;
+  document.getElementById('pName').textContent=USER.name||'Aura User';
+  document.getElementById('pEmail').textContent=USER.email||'';
+  document.getElementById('dispName').value=USER.name||'';
+  document.getElementById('ddName').textContent=USER.name||'Aura User';
+  document.getElementById('ddEmail').textContent=USER.email||'';
+  if(USER.photo){
+    ['topAv','pavLg'].forEach(id=>{
+      const el=document.getElementById(id);
+      el.innerHTML=`<img src="${USER.photo}" alt="${USER.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>`;
+    });
+  }
+}
+
+// Month badge
+const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+document.getElementById('monthBadge').textContent=mn[new Date().getMonth()]+' '+new Date().getFullYear();
+
+// Greeting
+(function(){
+  if(!USER)return;
+  const h=new Date().getHours();
+  const g=h<12?'Good morning':h<17?'Good afternoon':'Good evening';
+  const em=['✨','🌸','💙','🌊','🎯','🌿'];
+  document.getElementById('ctaGreet').textContent=`${g}, ${USER.name?USER.name.split(' ')[0]:'friend'} ${em[0|Math.random()*em.length]}`;
+})();
+
+// Prefs
+const P=_getPrefs();
+document.getElementById('togPart').checked=P.particles;
+document.getElementById('togWC').checked=P.wordCount;
+document.getElementById('togPr').checked=P.prompts;
+
+// ══ USER PILL DROPDOWN ════════════════════════════════════
+const userPill=document.getElementById('userPill');
+const dropdown=document.getElementById('userDropdown');
+userPill.addEventListener('click',e=>{
+  e.stopPropagation();
+  dropdown.classList.toggle('open');
+});
+document.addEventListener('click',()=>dropdown.classList.remove('open'));
+dropdown.addEventListener('click',e=>e.stopPropagation());
+
+document.getElementById('ddNewEntry').addEventListener('click',()=>{dropdown.classList.remove('open');openEditor();});
+document.getElementById('ddSettings').addEventListener('click',()=>{dropdown.classList.remove('open');switchTab('settings');});
+document.getElementById('ddExport').addEventListener('click',()=>{dropdown.classList.remove('open');doExport();});
+document.getElementById('ddLogout').addEventListener('click',()=>doSignOut());
+
+// ══ TAB SWITCHING ═════════════════════════════════════════
+function switchTab(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+  document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('on',b.dataset.tab===name));
+  document.getElementById('tab-'+name).classList.add('on');
+  if(name==='calendar')renderCal();
+  if(name==='mood')    renderMood();
+  if(name==='search')  renderSearch(document.getElementById('searchInp').value);
+}
+document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
+
+// ══ HOME ══════════════════════════════════════════════════
+let homeFilter='all';
+
+function calcStats(entries){
+  const words=entries.reduce((s,e)=>s+(e.bodyText?e.bodyText.trim().split(/\s+/).filter(Boolean).length:0),0);
+  let streak=0;const today=new Date();
+  for(let i=0;i<90;i++){
+    const d=new Date(today);d.setDate(d.getDate()-i);
+    if(entries.find(e=>e.date===d.toISOString().split('T')[0]))streak++;else break;
+  }
+  const mc={};entries.forEach(e=>{mc[e.mood]=(mc[e.mood]||0)+1});
+  const top=Object.entries(mc).sort((a,b)=>b[1]-a[1])[0];
+  return{entries:entries.length,words,streak,topMood:top?top[0]:'—'};
+}
+
+function flashNum(id,val){
+  const el=document.getElementById(id);
+  el.textContent=val;
+  el.classList.remove('flash');
+  void el.offsetWidth;
+  el.classList.add('flash');
+}
+
+function renderHome(f){
+  if(f!==undefined)homeFilter=f;
+  const all=_getEntries();
+  const filtered=homeFilter==='all'?all:all.filter(e=>e.mood===homeFilter);
+  const s=calcStats(all);
+  flashNum('stE',s.entries);
+  flashNum('stW',s.words>=1000?(s.words/1000).toFixed(1)+'k':s.words);
+  flashNum('stS',s.streak);
+  document.getElementById('stMI').textContent=s.topMood;
+  document.getElementById('stML').textContent=s.entries?'Top Mood':'—';
+  renderCards(filtered,document.getElementById('homeCards'));
+}
+
+document.getElementById('filterBar').addEventListener('click',e=>{
+  const b=e.target.closest('.fb');if(!b)return;
+  document.querySelectorAll('.fb').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');renderHome(b.dataset.f);
+});
+document.getElementById('ctaBanner').addEventListener('click',openEditor);
+document.getElementById('ctaNewBtn').addEventListener('click',e=>{e.stopPropagation();openEditor();});
+document.getElementById('newBtn').addEventListener('click',openEditor);
+document.getElementById('newBtn2').addEventListener('click',openEditor);
+document.getElementById('calNewBtn').addEventListener('click',openEditor);
+
+// ══ CARDS ══════════════════════════════════════════════════
+function makeCard(e,i){
+  const c=document.createElement('div');c.className='card';c.style.animationDelay=(i*.06)+'s';
+  c.innerHTML=`
+    <div class="card-stripe"></div>
+    <div class="card-date">📅 ${fmtDate(e.date)} · ${e.time}</div>
+    <div class="card-title">${e.title||'Untitled'}</div>
+    <div class="card-body">${e.bodyText||''}</div>
+    <div class="card-foot">
+      <span class="card-mood">${e.mood}</span>
+      <div class="card-tags">${(e.tags||[]).map(t=>`<span class="card-tag">${t}</span>`).join('')}</div>
+    </div>`;
+  c.addEventListener('click',()=>openEditor(e));
+  return c;
+}
+function renderCards(arr,cont){
+  cont.innerHTML='';
+  if(!arr.length){
+    cont.innerHTML='<div class="empty-state"><span class="big">✍️</span><p>No entries yet.<br>Tap <strong>+ New Entry</strong> to start writing.</p></div>';
+    return;
+  }
+  arr.forEach((e,i)=>cont.appendChild(makeCard(e,i)));
+}
+
+// ══ CALENDAR ══════════════════════════════════════════════
+let calY=new Date().getFullYear(),calM=new Date().getMonth();
+const MN=['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+function renderCal(){
+  document.getElementById('calTitle').textContent=`${MN[calM]} ${calY}`;
+  const grid=document.getElementById('calGrid');grid.innerHTML='';
+  const entries=_getEntries();const today=new Date();
+  ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d=>{
+    const el=document.createElement('div');el.className='cal-dname';el.textContent=d;grid.appendChild(el);
+  });
+  const first=new Date(calY,calM,1).getDay();
+  const days=new Date(calY,calM+1,0).getDate();
+  for(let i=0;i<first;i++){const el=document.createElement('button');el.className='cal-day empty';grid.appendChild(el);}
+  for(let d=1;d<=days;d++){
+    const ds=`${calY}-${String(calM+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const has=entries.find(e=>e.date===ds);
+    const el=document.createElement('button');el.className='cal-day';el.textContent=d;
+    if(has)el.classList.add('has-e');
+    if(d===today.getDate()&&calM===today.getMonth()&&calY===today.getFullYear())el.classList.add('today');
+    el.addEventListener('click',()=>has?showDayEntries(ds):openEditor(null,ds));
+    grid.appendChild(el);
+  }
+}
+function showDayEntries(ds){
+  const area=document.getElementById('calDay');
+  const es=_getEntries().filter(e=>e.date===ds);
+  if(!es.length){area.innerHTML='';return;}
+  area.innerHTML=`<div class="sec-title" style="margin-top:24px">Entries for ${fmtDate(ds)}</div><div class="cards" id="calCards"></div>`;
+  es.forEach((e,i)=>document.getElementById('calCards').appendChild(makeCard(e,i)));
+}
+document.getElementById('calPrev').addEventListener('click',()=>{calM--;if(calM<0){calM=11;calY--;}renderCal();});
+document.getElementById('calNext').addEventListener('click',()=>{calM++;if(calM>11){calM=0;calY++;}renderCal();});
+
+// ══ MOOD TRACKER ══════════════════════════════════════════
+const MOODS=['😊','😌','🔥','🌧','😴','🤩'];
+function renderMood(){
+  const entries=_getEntries();
+  const cnt={};MOODS.forEach(m=>{cnt[m]=entries.filter(e=>e.mood===m).length;});
+  const mx=Math.max(...Object.values(cnt),1);
+  document.getElementById('moodBars').innerHTML=MOODS.map(m=>`
+    <div class="bar-row">
+      <span class="bar-em">${m}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${(cnt[m]/mx*100).toFixed(1)}%"></div></div>
+      <span class="bar-cnt">${cnt[m]}</span>
+    </div>`).join('');
+  const recent=entries.slice(0,8);
+  document.getElementById('moodLog').innerHTML=recent.length
+    ?recent.map(e=>`<div class="log-item"><span class="log-em">${e.mood}</span><div><div class="log-ttl">${e.title||'Untitled'}</div><div class="log-dt">${fmtDate(e.date)}</div></div></div>`).join('')
+    :'<div style="color:var(--muted);font-size:.85rem;padding:10px 0">No entries yet. Start writing!</div>';
+}
+function quickMood(m){openEditor(null,null,m);toast(m+' Opening editor…');}
+
+// ══ SEARCH ════════════════════════════════════════════════
+function renderSearch(q){
+  const entries=_getEntries();
+  const filtered=q.trim()
+    ?entries.filter(e=>[e.title,e.bodyText,e.mood,...(e.tags||[])].join(' ').toLowerCase().includes(q.toLowerCase()))
+    :entries;
+  const cont=document.getElementById('searchCards');
+  const empty=document.getElementById('searchEmpty');
+  cont.innerHTML='';
+  empty.classList.toggle('hidden',filtered.length>0);
+  filtered.forEach((e,i)=>cont.appendChild(makeCard(e,i)));
+}
+document.getElementById('searchInp').addEventListener('input',function(){renderSearch(this.value);});
+
+// ══ SETTINGS ══════════════════════════════════════════════
+document.getElementById('togPart').addEventListener('change',function(){
+  _savePref('particles',this.checked);
+  document.getElementById('ptx').style.display=this.checked?'':'none';
+});
+document.getElementById('togWC').addEventListener('change',function(){_savePref('wordCount',this.checked);});
+document.getElementById('togPr').addEventListener('change',function(){_savePref('prompts',this.checked);});
+
+document.getElementById('saveNameBtn').addEventListener('click',()=>{
+  const n=document.getElementById('dispName').value.trim();
+  if(!n){toast('👤 Enter a name.');return;}
+  const u=JSON.parse(localStorage.getItem('aura_user_v1')||'{}');
+  u.name=n;localStorage.setItem('aura_user_v1',JSON.stringify(u));
+  document.getElementById('topName').textContent=n.split(' ')[0];
+  document.getElementById('pName').textContent=n;
+  document.getElementById('ddName').textContent=n;
+  toast('✅ Name updated!');
+});
+
+function doExport(){
+  const a=document.createElement('a');
+  a.href='data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(_getEntries(),null,2));
+  a.download='aura_journal_'+todayISO()+'.json';a.click();toast('📦 Exported!');
+}
+document.getElementById('exportBtn').addEventListener('click',doExport);
+
+document.getElementById('clearBtn').addEventListener('click',()=>{
+  if(!confirm('Delete ALL entries? This cannot be undone.'))return;
+  localStorage.removeItem(EK);
+  renderHome();renderCal();renderMood();renderSearch('');
+  toast('🗑️ All entries cleared.');
+});
+
+function doSignOut(){
+  localStorage.removeItem('aura_user_v1');
+  window.location.href='auth.html';
+}
+document.getElementById('signOutBtn').addEventListener('click',doSignOut);
+
+// ══ EDITOR ════════════════════════════════════════════════
+let editEnt=null,edMood='😊',edTags=['Personal'],edWx='☀️ Sunny';
+
+function openEditor(entry,forceDate,forceMood){
+  editEnt=entry||null;
+  edMood=entry?.mood||forceMood||'😊';
+  edTags=entry?[...(entry.tags||[])]:['Personal'];
+  edWx=entry?.wx||'☀️ Sunny';
+
+  const now=new Date();
+  const day=entry?new Date(entry.date+'T00:00:00'):forceDate?new Date(forceDate+'T00:00:00'):now;
+  document.getElementById('edDay').textContent=String(day.getDate()).padStart(2,'0');
+  document.getElementById('edMon').textContent=day.toLocaleString('en',{month:'long'}).toUpperCase()+' '+day.getFullYear();
+  document.getElementById('edTitle').textContent=entry?'Edit Entry':'New Entry · '+now.toLocaleDateString('en',{day:'numeric',month:'short'});
+  document.getElementById('edEntTitle').value=entry?.title||'';
+
+  // Rich text body
+  const body=document.getElementById('edEntBody');
+  body.innerHTML=entry?.bodyHtml||'';
+
+  updateWC();
+  document.getElementById('edDelBtn').style.display=entry?'':'none';
+
+  // ── Mood picker sync ──────────────────────────────────
+  document.querySelectorAll('#moodPicker .mp').forEach(b=>{
+    b.classList.toggle('on',b.dataset.m===edMood);
+  });
+  // ── Tags sync ─────────────────────────────────────────
+  document.querySelectorAll('#tagChips .chip').forEach(c=>{
+    c.classList.toggle('on',edTags.includes(c.dataset.t));
+  });
+  // ── Weather sync ──────────────────────────────────────
+  document.querySelectorAll('#wxChips .chip').forEach(c=>{
+    c.classList.toggle('on',c.dataset.t===edWx);
+  });
+
+  document.getElementById('edModal').classList.add('show');
+  setTimeout(()=>document.getElementById('edEntTitle').focus(),380);
+}
+
+function closeEditor(){document.getElementById('edModal').classList.remove('show');}
+
+document.getElementById('edModal').addEventListener('click',e=>{
+  if(e.target===document.getElementById('edModal'))closeEditor();
+});
+document.getElementById('edCloseBtn').addEventListener('click',closeEditor);
+
+// ── MOOD PICKER — event delegation, works reliably ────────
+document.getElementById('moodPicker').addEventListener('click',function(e){
+  const btn=e.target.closest('.mp');
+  if(!btn)return;
+  // Remove .on from all, add to clicked
+  this.querySelectorAll('.mp').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  edMood=btn.dataset.m;
+});
+
+// ── Tags ──────────────────────────────────────────────────
+document.getElementById('tagChips').addEventListener('click',e=>{
+  const c=e.target.closest('.chip');if(!c)return;
+  c.classList.toggle('on');
+  edTags=[...document.querySelectorAll('#tagChips .chip.on')].map(x=>x.dataset.t);
+});
+
+// ── Weather ───────────────────────────────────────────────
+document.getElementById('wxChips').addEventListener('click',e=>{
+  const c=e.target.closest('.chip');if(!c)return;
+  document.querySelectorAll('#wxChips .chip').forEach(x=>x.classList.remove('on'));
+  c.classList.add('on');edWx=c.dataset.t;
+});
+
+// ── Rich Text Toolbar ─────────────────────────────────────
+// Uses execCommand on the contenteditable div — actually works in all browsers
+document.getElementById('edToolbar').addEventListener('mousedown',function(e){
+  const btn=e.target.closest('[data-cmd]');
+  if(!btn)return;
+  e.preventDefault(); // keep focus in editor
+  const cmd=btn.dataset.cmd;
+  const val=btn.dataset.val||null;
+  document.execCommand(cmd,false,val);
+  // Toggle active state for formatting buttons
+  if(['bold','italic','underline','strikeThrough'].includes(cmd)){
+    btn.classList.toggle('active',document.queryCommandState(cmd));
+  }
+  document.getElementById('edEntBody').focus();
+});
+
+// Font size
+document.getElementById('fontSizeSelect').addEventListener('change',function(e){
+  e.preventDefault();
+  document.getElementById('edEntBody').focus();
+  document.execCommand('fontSize',false,this.value);
+});
+
+// Text colour
+document.getElementById('colorPicker').addEventListener('input',function(){
+  document.getElementById('edEntBody').focus();
+  document.execCommand('foreColor',false,this.value);
+});
+
+// Update toolbar active states on selection change
+document.getElementById('edEntBody').addEventListener('keyup',updateToolbarState);
+document.getElementById('edEntBody').addEventListener('mouseup',updateToolbarState);
+function updateToolbarState(){
+  ['bold','italic','underline','strikeThrough'].forEach(cmd=>{
+    const btn=document.querySelector(`[data-cmd="${cmd}"]`);
+    if(btn)btn.classList.toggle('active',document.queryCommandState(cmd));
+  });
+  updateWC();
+}
+
+// Word count
+function updateWC(){
+  const body=document.getElementById('edEntBody');
+  const text=body?body.innerText||'':'';
+  const w=wordCount(text);
+  document.getElementById('wcDisplay').textContent=w+' word'+(w!==1?'s':'');
+}
+document.getElementById('edEntBody').addEventListener('input',updateWC);
+
+// Writing prompts
+const PROMPTS=[
+  'What made you smile today, even briefly?',
+  'Describe today using only colors and textures.',
+  'What would you tell your past self from one year ago?',
+  'What is one thing this month has taught you so far?',
+  'Write about a sound you heard today you want to remember.',
+  'What are you quietly proud of this week?',
+  'If today were a chapter title in your life, what would it be?',
+  'What small, unexpected thing brought joy today?',
+  'Who are you slowly becoming?',
+  'What do you need to let go of right now?',
+  'What does your body need that your mind keeps ignoring?',
+  'Write the first three things you see right now and why they matter.',
+];
+document.getElementById('promptBtn').addEventListener('click',function(){
+  const body=document.getElementById('edEntBody');
+  body.focus();
+  const p=PROMPTS[0|Math.random()*PROMPTS.length];
+  // Insert at cursor position
+  const sel=window.getSelection();
+  if(sel.rangeCount){
+    const range=sel.getRangeAt(0);
+    range.collapse(false);
+    const node=document.createTextNode('\n\n💡 '+p+'\n');
+    range.insertNode(node);
+    range.setStartAfter(node);range.setEndAfter(node);
+    sel.removeAllRanges();sel.addRange(range);
+  } else {
+    body.innerHTML+=`<p>💡 ${p}</p>`;
+  }
+  updateWC();
+});
+
+// ── Save entry ────────────────────────────────────────────
+document.getElementById('edSaveBtn').addEventListener('click',()=>{
+  const title=document.getElementById('edEntTitle').value.trim();
+  const body=document.getElementById('edEntBody');
+  const bodyHtml=body.innerHTML.trim();
+  const bodyText=(body.innerText||'').trim();
+
+  if(!bodyText&&!bodyHtml){toast('✏️ Write something first!');return;}
+
+  const entry={
+    id:editEnt?.id||Date.now(),
+    title:title||'Untitled Entry',
+    bodyHtml,        // rich HTML for rendering back in editor
+    bodyText,        // plain text for search, stats, preview
+    mood:edMood,
+    date:editEnt?.date||todayISO(),
+    time:nowTime(),
+    tags:[...edTags],
+    wx:edWx,
+  };
+
+  saveEnt(entry);
+  renderHome();
+  renderMood();
+  renderSearch(document.getElementById('searchInp').value);
+  if(document.getElementById('tab-calendar').classList.contains('on'))renderCal();
+  closeEditor();
+  toast(editEnt?'✏️ Entry updated!':'🌸 Entry saved!');
+});
+
+// ── Delete ────────────────────────────────────────────────
+document.getElementById('edDelBtn').addEventListener('click',()=>{
+  if(!editEnt||!confirm('Delete this entry? Cannot be undone.'))return;
+  delEnt(editEnt.id);
+  renderHome();renderMood();renderCal();
+  closeEditor();toast('🗑️ Entry deleted.');
+});
+
+// ── First render ──────────────────────────────────────────
+renderHome();
+renderSearch('');
+</script>
+</body>
+</html>

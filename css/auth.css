@@ -1,0 +1,143 @@
+/* ═══════════════════════════════════════════════════════
+   AURA · Auth Page  (auth.html)
+   Two form panels side-by-side. Coloured overlay slides
+   over whichever panel should be hidden.
+═══════════════════════════════════════════════════════ */
+
+body{display:flex;align-items:center;justify-content:center;min-height:100vh;overflow:hidden}
+
+/* ── Card ── */
+.auth-card{
+  position:relative;width:820px;min-height:520px;
+  border-radius:var(--r);background:var(--bg);
+  box-shadow:var(--shadow);overflow:hidden;
+  animation:cardIn .9s cubic-bezier(.22,1,.36,1) both;
+  z-index:10;
+}
+
+/* ── Form panels – each 50% wide, stacked via absolute ── */
+.panel{
+  position:absolute;top:0;width:50%;height:100%;
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:40px 34px;z-index:1;
+}
+#pLogin  {left:0}
+#pSignup {left:50%}
+
+/* ── Sliding coloured overlay ──────────────────────────
+   State A (login visible):  overlay covers RIGHT half
+   State B (signup visible): overlay covers LEFT  half  */
+.ovl{
+  position:absolute;
+  top:12px;
+  width:calc(50% - 24px);
+  height:calc(100% - 24px);
+  background:var(--grad);
+  border-radius:20px;
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:14px;padding:36px 24px;
+  overflow:hidden;z-index:20;
+  /* default: covers RIGHT (signup hidden) */
+  left:calc(50% + 12px);
+  transition:left .75s cubic-bezier(.77,0,.175,1);
+}
+/* Slide LEFT → covers login panel */
+.ovl.left{left:12px}
+
+/* Decorative rings */
+.ovl::before{
+  content:'';position:absolute;width:230px;height:230px;border-radius:50%;
+  border:2px solid rgba(255,255,255,.12);top:-74px;right:-74px;
+  animation:spin 14s linear infinite;
+}
+.ovl::after{
+  content:'';position:absolute;width:140px;height:140px;border-radius:50%;
+  border:2px solid rgba(255,255,255,.1);bottom:-48px;left:-32px;
+  animation:spin 20s linear infinite reverse;
+}
+.ovl-orb{position:absolute;border-radius:50%;background:rgba(255,255,255,.07);animation:driftY ease-in-out infinite}
+.ovl-brand{font-family:'Playfair Display',serif;font-style:italic;font-size:1.1rem;color:rgba(255,255,255,.78);letter-spacing:2px;position:relative;z-index:1}
+.ovl-title{font-size:2rem;font-weight:900;color:#fff;text-align:center;line-height:1.2;text-shadow:0 2px 14px rgba(0,0,0,.12);position:relative;z-index:1;animation:pulseScale 3.5s ease-in-out infinite}
+.ovl-sub{font-size:.81rem;color:rgba(255,255,255,.84);text-align:center;line-height:1.65;position:relative;z-index:1}
+.ovl-btn{position:relative;z-index:1;overflow:hidden}
+
+/* ── Panel inner elements ── */
+.fp-icon{
+  width:60px;height:60px;border-radius:50%;
+  background:var(--bg);box-shadow:var(--shadow-sm);
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:12px;cursor:pointer;
+  transition:box-shadow .2s,transform .2s;
+}
+.fp-icon:hover {transform:scale(1.08);box-shadow:var(--shadow)}
+.fp-icon:active{box-shadow:var(--inset);transform:scale(.96)}
+.fp-icon svg{width:27px;height:27px;stroke:var(--accent);fill:none;stroke-width:1.8}
+
+.panel-title{font-size:1.55rem;font-weight:900;color:var(--text);margin-bottom:14px;text-align:center}
+
+.socials{display:flex;gap:11px;margin-bottom:10px}
+.soc:nth-child(1){animation-delay:.26s}
+.soc:nth-child(2){animation-delay:.40s}
+
+.divider{font-size:.71rem;color:var(--muted);margin-bottom:11px;letter-spacing:.5px}
+
+.fields{width:100%;display:flex;flex-direction:column;gap:11px;margin-bottom:14px}
+
+.row-bottom{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px}
+
+.forgot-btn{
+  font-size:.78rem;font-weight:700;color:var(--accent2);
+  background:none;border:none;padding:0;cursor:pointer;
+  font-family:inherit;transition:color .2s;
+}
+.forgot-btn:hover{color:var(--text);text-decoration:underline}
+
+/* ── Inline message ── */
+.msg{
+  width:100%;padding:9px 14px;border-radius:var(--rx);
+  font-size:.78rem;font-weight:700;margin-bottom:10px;text-align:center;
+  display:none;
+}
+.msg.err{display:block;background:rgba(224,92,92,.1);color:#c43c3c;border:1px solid rgba(224,92,92,.22)}
+.msg.ok {display:block;background:rgba(26,184,212,.1);color:var(--accent2);border:1px solid rgba(26,184,212,.22)}
+
+/* ── Forgot password modal ── */
+.modal-bg{
+  position:fixed;inset:0;z-index:300;
+  background:rgba(180,200,210,.52);backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .3s;
+}
+.modal-bg.show{opacity:1;pointer-events:all}
+.modal{
+  background:var(--bg);border-radius:var(--r);box-shadow:var(--shadow);
+  padding:40px 36px;width:400px;max-width:94vw;text-align:center;
+  transform:translateY(22px) scale(.96);
+  transition:transform .4s cubic-bezier(.22,1,.36,1);
+}
+.modal-bg.show .modal{transform:translateY(0) scale(1)}
+.modal-icon{font-size:2.8rem;margin-bottom:12px}
+.modal h2{font-size:1.25rem;font-weight:900;color:var(--text);margin-bottom:8px}
+.modal p {font-size:.83rem;color:var(--muted);margin-bottom:22px;line-height:1.6}
+.modal-fields{display:flex;flex-direction:column;gap:12px}
+.modal-back{margin-top:14px;font-size:.77rem;color:var(--muted);background:none;border:none;cursor:pointer;font-family:inherit;transition:color .2s}
+.modal-back:hover{color:var(--text)}
+
+/* ── Demo banner ── */
+.demo-bar{
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--grad);color:#fff;text-align:center;
+  padding:9px 20px;font-size:.77rem;font-weight:700;z-index:9999;letter-spacing:.3px;
+}
+.demo-bar code{background:rgba(255,255,255,.22);padding:2px 7px;border-radius:5px}
+
+/* ── Responsive ── */
+@media(max-width:680px){
+  .auth-card{width:96vw;min-height:auto}
+  .panel{position:relative;width:100%;left:auto}
+  #pSignup{display:none;left:auto}
+  #pSignup.show{display:flex}
+  #pLogin.hide{display:none}
+  .ovl{position:relative;width:calc(100% - 24px);height:auto;min-height:180px;left:auto;top:auto;margin:12px;border-radius:20px}
+  .ovl.left{left:auto}
+}

@@ -1,0 +1,161 @@
+/* ═══════════════════════════════════════════════════════
+   AURA · Global Design System
+   Neumorphic · #dde8f0 base · Cyan-Blue accent
+═══════════════════════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,500&display=swap');
+
+:root {
+  --bg:       #dde8f0;
+  --sd:       #b5c9d5;
+  --sl:       #ffffff;
+  --accent:   #1ab8d4;
+  --accent2:  #1488CC;
+  --grad:     linear-gradient(145deg,#5ad8e8,#1488CC);
+  --grad2:    linear-gradient(160deg,#3ecfdf,#0f6fa0);
+  --text:     #2d4a5a;
+  --muted:    #6a8fa0;
+
+  --shadow:   8px 8px 22px var(--sd),-8px -8px 22px var(--sl);
+  --shadow-sm:4px 4px 12px var(--sd),-4px -4px 12px var(--sl);
+  --shadow-xs:2px 2px 6px  var(--sd),-2px -2px 6px  var(--sl);
+  --inset:    inset 4px 4px 10px var(--sd),inset -4px -4px 10px var(--sl);
+  --inset-sm: inset 2px 2px 6px  var(--sd),inset -2px -2px 6px  var(--sl);
+
+  --r:  26px;
+  --rs: 16px;
+  --rx: 10px;
+}
+
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html,body{
+  font-family:'Nunito',sans-serif;
+  background:var(--bg);color:var(--text);
+  min-height:100vh;-webkit-font-smoothing:antialiased;
+}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer}
+input,textarea{font-family:inherit}
+
+/* ── Particles ── */
+#ptx{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.pt{position:absolute;border-radius:50%;opacity:0;animation:ptRise linear infinite}
+@keyframes ptRise{
+  0%{transform:translateY(105vh) scale(.7);opacity:0}
+  8%{opacity:.15}90%{opacity:.05}
+  100%{transform:translateY(-8vh) scale(1.3);opacity:0}
+}
+
+/* ── Buttons ── */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  border:none;border-radius:50px;
+  background:var(--bg);box-shadow:var(--shadow-sm);
+  font-size:.84rem;font-weight:800;color:var(--accent);
+  letter-spacing:.8px;text-transform:uppercase;padding:11px 26px;
+  transition:box-shadow .2s,transform .2s,color .2s;position:relative;overflow:hidden;
+}
+.btn:hover  {transform:translateY(-2px);box-shadow:var(--shadow);color:var(--text)}
+.btn:active {box-shadow:var(--inset);transform:scale(.97)}
+.btn-grad{background:var(--grad);color:#fff;box-shadow:4px 4px 14px rgba(20,136,204,.28)}
+.btn-grad:hover{color:#fff;box-shadow:6px 6px 22px rgba(20,136,204,.38)}
+.btn-ghost{background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.6)}
+.btn-ghost:hover{background:rgba(255,255,255,.26);color:#fff;box-shadow:0 6px 20px rgba(0,0,0,.12)}
+.btn-danger{color:#e05c5c;background:var(--bg);box-shadow:var(--shadow-sm)}
+.btn-danger:hover{color:#c43c3c;box-shadow:var(--shadow)}
+.btn.loading{opacity:.7;pointer-events:none}
+.btn.loading::after{
+  content:'';position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  width:14px;height:14px;border:2px solid currentColor;border-top-color:transparent;
+  border-radius:50%;animation:spin .7s linear infinite;
+}
+
+/* ── Inputs ── */
+.neu-wrap{position:relative;width:100%}
+.neu-wrap .ico{
+  position:absolute;left:15px;top:50%;transform:translateY(-50%);
+  width:17px;height:17px;stroke:var(--muted);fill:none;stroke-width:2;
+  pointer-events:none;transition:stroke .2s;
+}
+.neu-wrap:focus-within .ico{stroke:var(--accent)}
+.neu-inp{
+  width:100%;padding:13px 15px 13px 42px;
+  border:none;border-radius:50px;
+  background:var(--bg);box-shadow:var(--inset);
+  font-size:.9rem;color:var(--text);outline:none;transition:box-shadow .2s;
+}
+.neu-inp::placeholder{color:#9ab5c2}
+.neu-inp:focus{
+  box-shadow:inset 5px 5px 12px #aec2ce,inset -5px -5px 12px #f0faff,
+             0 0 0 2.5px rgba(26,184,212,.22);
+}
+
+/* ── Social btn ── */
+.soc{
+  width:46px;height:46px;border-radius:50%;border:none;
+  background:var(--bg);box-shadow:var(--shadow-sm);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:box-shadow .2s,transform .2s;
+  animation:popIn .5s cubic-bezier(.34,1.56,.64,1) both;
+}
+.soc:hover {transform:translateY(-3px) scale(1.1);box-shadow:var(--shadow)}
+.soc:active{box-shadow:var(--inset);transform:scale(.94)}
+.soc svg   {width:20px;height:20px}
+@keyframes popIn{from{opacity:0;transform:scale(.3)}to{opacity:1;transform:scale(1)}}
+
+/* ── Chip ── */
+.chip{
+  padding:5px 12px;border-radius:50px;
+  font-size:.72rem;font-weight:700;
+  background:var(--bg);box-shadow:var(--inset-sm);color:var(--muted);
+  cursor:pointer;transition:all .2s;display:inline-block;
+}
+.chip:hover,.chip.on{box-shadow:var(--shadow-xs);color:var(--accent2)}
+
+/* ── Toggle ── */
+.tog{position:relative;width:48px;height:26px;display:inline-block}
+.tog input{opacity:0;width:0;height:0}
+.tog-track{
+  position:absolute;inset:0;border-radius:50px;
+  background:var(--bg);box-shadow:var(--inset-sm);cursor:pointer;transition:background .3s;
+}
+.tog-track::before{
+  content:'';position:absolute;width:18px;height:18px;border-radius:50%;
+  background:var(--bg);box-shadow:var(--shadow-xs);left:4px;top:4px;transition:transform .3s;
+}
+.tog input:checked+.tog-track{background:rgba(26,184,212,.14)}
+.tog input:checked+.tog-track::before{
+  transform:translateX(22px);
+  background:var(--grad);box-shadow:2px 2px 6px rgba(20,136,204,.3),-1px -1px 4px rgba(255,255,255,.8);
+}
+
+/* ── Ripple ── */
+.rip{
+  position:absolute;border-radius:50%;
+  background:rgba(255,255,255,.35);
+  transform:scale(0);animation:ripAnim .6s linear;pointer-events:none;z-index:99;
+}
+@keyframes ripAnim{to{transform:scale(4);opacity:0}}
+
+/* ── Toast ── */
+#aura-toast{
+  position:fixed;bottom:28px;right:28px;z-index:9999;
+  background:var(--grad);color:#fff;
+  padding:13px 26px;border-radius:50px;
+  font-weight:800;font-size:.86rem;letter-spacing:.3px;
+  box-shadow:0 8px 28px rgba(20,136,204,.3);
+  transform:translateY(80px);opacity:0;
+  transition:all .42s cubic-bezier(.22,1,.36,1);pointer-events:none;
+}
+#aura-toast.show{transform:translateY(0);opacity:1}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--sd);border-radius:10px}
+
+/* ── Keyframes ── */
+@keyframes cardIn{from{opacity:0;transform:translateY(44px) scale(.93)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes driftY{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
+@keyframes pulseScale{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}

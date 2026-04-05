@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AURA · Sign In</title>
+    <link rel="stylesheet" href="css/global.css" />
+    <link rel="stylesheet" href="css/auth.css" />
+</head>
+
+<body>
+    <div id="ptx"></div>
+
+    <div class="auth-card" id="authCard">
+
+        <!-- ══ LOGIN PANEL (left half) ══ -->
+        <div class="panel" id="pLogin">
+            <div class="fp-icon">
+                <svg viewBox="0 0 24 24">
+        <path d="M12 1C8.5 1 5.5 3.2 4.3 6.3" stroke-linecap="round"/>
+        <path d="M19.7 6.3C18.5 3.2 15.5 1 12 1" stroke-linecap="round"/>
+        <path d="M1 12c0-.7.1-1.4.2-2" stroke-linecap="round"/>
+        <path d="M22.8 10C23 10.6 23 11.3 23 12" stroke-linecap="round"/>
+        <path d="M12 7c2.8 0 5 2.2 5 5 0 4.5-2 8-5 8s-5-3.5-5-8c0-2.8 2.2-5 5-5z" stroke-linecap="round"/>
+        <path d="M12 11v3" stroke-linecap="round"/>
+        <circle cx="12" cy="11" r="1" fill="var(--accent)" stroke="none"/>
+      </svg>
+            </div>
+            <h1 class="panel-title">Sign in</h1>
+            <div class="msg" id="lMsg"></div>
+            <div class="socials">
+                <button class="soc" id="gLoginBtn" title="Continue with Google">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.83z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.83C6.71 7.31 9.14 5.38 12 5.38z" fill="#EA4335"/>
+        </svg>
+      </button>
+                <button class="soc" id="fbLoginBtn" title="Continue with Facebook">
+        <svg viewBox="0 0 24 24" fill="#1877F2">
+          <path d="M24 12.07C24 5.41 18.63 0 12 0S0 5.41 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.04V9.41c0-3.02 1.8-4.7 4.54-4.7 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.95.93-1.95 1.88v2.27h3.32l-.53 3.49h-2.79V24C19.61 23.1 24 18.1 24 12.07z"/>
+        </svg>
+      </button>
+            </div>
+            <p class="divider">or use your account</p>
+            <div class="fields">
+                <div class="neu-wrap">
+                    <input class="neu-inp" type="email" id="lEmail" placeholder="Email" autocomplete="email" />
+                    <svg class="ico" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 7 10-7"/></svg>
+                </div>
+                <div class="neu-wrap">
+                    <input class="neu-inp" type="password" id="lPass" placeholder="Password" autocomplete="current-password" />
+                    <svg class="ico" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </div>
+            </div>
+            <div class="row-bottom">
+                <button class="forgot-btn" id="forgotBtn">Forgot password?</button>
+                <button class="btn" id="loginBtn">SIGN IN</button>
+            </div>
+        </div>
+
+        <!-- ══ SIGNUP PANEL (right half) ══ -->
+        <div class="panel" id="pSignup">
+            <h1 class="panel-title">Create Account</h1>
+            <div class="msg" id="sMsg"></div>
+            <div class="socials">
+                <button class="soc" id="gSignupBtn" title="Continue with Google">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.83z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.83C6.71 7.31 9.14 5.38 12 5.38z" fill="#EA4335"/>
+        </svg>
+      </button>
+                <button class="soc" id="fbSignupBtn" title="Continue with Facebook">
+        <svg viewBox="0 0 24 24" fill="#1877F2">
+          <path d="M24 12.07C24 5.41 18.63 0 12 0S0 5.41 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.04V9.41c0-3.02 1.8-4.7 4.54-4.7 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.95.93-1.95 1.88v2.27h3.32l-.53 3.49h-2.79V24C19.61 23.1 24 18.1 24 12.07z"/>
+        </svg>
+      </button>
+            </div>
+            <p class="divider">or register with email</p>
+            <div class="fields">
+                <div class="neu-wrap">
+                    <input class="neu-inp" type="text" id="sName" placeholder="Full Name" autocomplete="name" />
+                    <svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                </div>
+                <div class="neu-wrap">
+                    <input class="neu-inp" type="email" id="sEmail" placeholder="Email" autocomplete="email" />
+                    <svg class="ico" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 7 10-7"/></svg>
+                </div>
+                <div class="neu-wrap">
+                    <input class="neu-inp" type="password" id="sPass" placeholder="Password (6+ characters)" />
+                    <svg class="ico" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </div>
+            </div>
+            <button class="btn btn-grad" id="signupBtn" style="width:100%;justify-content:center">CREATE ACCOUNT</button>
+        </div>
+
+        <!-- ══ SLIDING OVERLAY ══
+       Default: right half (signup hidden) → covers login when .left
+  ══ -->
+        <div class="ovl" id="ovl">
+            <div class="ovl-orb" style="width:80px;height:80px;top:10%;left:8%;animation-duration:4.5s"></div>
+            <div class="ovl-orb" style="width:50px;height:50px;bottom:15%;right:8%;animation-duration:6s;animation-delay:1.2s"></div>
+            <div class="ovl-orb" style="width:28px;height:28px;top:56%;left:18%;animation-duration:5.2s;animation-delay:.7s"></div>
+            <span class="ovl-brand">AURA</span>
+            <h2 class="ovl-title" id="ovlTitle">Hello,<br>Friend!</h2>
+            <p class="ovl-sub" id="ovlSub">Welcome back. Your journal<br>is waiting for you. 🌸</p>
+            <button class="btn btn-ghost" id="ovlBtn">SIGN UP</button>
+        </div>
+
+    </div>
+
+    <!-- ══ FORGOT PASSWORD MODAL ══ -->
+    <div class="modal-bg" id="fpModal">
+        <div class="modal">
+            <div class="modal-icon">🔑</div>
+            <h2>Reset Password</h2>
+            <p>Enter your email. We'll let you set a new password right here.</p>
+            <div class="msg" id="fpMsg"></div>
+            <div class="modal-fields" id="fpFields">
+                <div class="neu-wrap">
+                    <input class="neu-inp" type="email" id="fpEmail" placeholder="Your email address" />
+                    <svg class="ico" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 7 10-7"/></svg>
+                </div>
+                <button class="btn btn-grad" id="fpSend" style="width:100%;justify-content:center">FIND ACCOUNT</button>
+            </div>
+            <button class="modal-back" id="fpClose">← Back to Sign In</button>
+        </div>
+    </div>
+
+    <!-- ══ FIREBASE SETUP GUIDE MODAL ══ -->
+    <div class="modal-bg" id="fbGuideModal">
+        <div class="modal" style="max-width:480px">
+            <div class="modal-icon">🔥</div>
+            <h2>Enable Social Login</h2>
+            <p style="text-align:left;font-size:.84rem;line-height:1.7;color:var(--muted)">
+                To use Google &amp; Facebook login, add your Firebase config:
+                <br><br>
+                <strong style="color:var(--text)">1.</strong> Go to <a href="https://console.firebase.google.com" target="_blank" style="color:var(--accent2);font-weight:700">console.firebase.google.com</a><br>
+                <strong style="color:var(--text)">2.</strong> Create project → Authentication → Enable Google + Facebook<br>
+                <strong style="color:var(--text)">3.</strong> Copy your <code style="background:rgba(26,184,212,.1);padding:2px 6px;border-radius:4px;color:var(--accent2)">firebaseConfig</code> object<br>
+                <strong style="color:var(--text)">4.</strong> Paste it into <code style="background:rgba(26,184,212,.1);padding:2px 6px;border-radius:4px;color:var(--accent2)">auth.html</code> inside the <code style="background:rgba(26,184,212,.1);padding:2px 6px;border-radius:4px;color:var(--accent2)">FIREBASE_CONFIG</code>                block<br>
+                <br>
+                <em style="font-size:.78rem">For now, use email/password — it works perfectly!</em>
+            </p>
+            <button class="btn btn-grad" id="fbGuideClose" style="width:100%;justify-content:center;margin-top:4px">GOT IT</button>
+        </div>
+    </div>
+
+    <div id="aura-toast"></div>
+
+    <!-- ══ FIREBASE SDK (loaded inline — no module issues) ══ -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+    <script>
+        'use strict';
+        /* ══════════════════════════════════════════════════════════
+           AURA · Auth  — works on localhost, no redirect loops
+           • Email/password → local accounts (SHA-256 hashed)
+           • Google / Facebook → Firebase (optional, guide shown if not set up)
+           • Forgot password → inline reset
+        ══════════════════════════════════════════════════════════ */
+
+        // ── Particles ─────────────────────────────────────────────
+        (function() {
+            const c = document.getElementById('ptx');
+            const cols = ['#3ecfdf', '#1a9fb8', '#5ad8e8', '#1488CC', '#a8dff0'];
+            for (let i = 0; i < 22; i++) {
+                const d = document.createElement('div');
+                d.className = 'pt';
+                const s = 14 + Math.random() * 54;
+                d.style.cssText = `width:${s}px;height:${s}px;left:${Math.random()*100}%;background:${cols[0|Math.random()*cols.length]};animation-duration:${9+Math.random()*14}s;animation-delay:${Math.random()*14}s`;
+                c.appendChild(d);
+            }
+        })();
+
+        // ── Keys ──────────────────────────────────────────────────
+        const K = {
+            A: 'aura_accounts_v1',
+            U: 'aura_user_v1'
+        };
+
+        // ── Already logged in? ────────────────────────────────────
+        // Only auto-redirect when NOT coming back from the app page
+        (function() {
+            const u = localStorage.getItem(K.U);
+            const back = document.referrer && (document.referrer.includes('index.html') || document.referrer.includes('aura/'));
+            // Use sessionStorage flag to break loop
+            const loopFlag = sessionStorage.getItem('_aura_loop');
+            if (u && !back && !loopFlag) {
+                window.location.replace('index.html');
+            }
+            sessionStorage.removeItem('_aura_loop');
+        })();
+
+        // ── Helpers ───────────────────────────────────────────────
+        async function sha256(s) {
+            const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s + '_aura26'));
+            return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        function getAcc() {
+            try {
+                return JSON.parse(localStorage.getItem(K.A) || '[]');
+            } catch {
+                return [];
+            }
+        }
+
+        function setAcc(a) {
+            localStorage.setItem(K.A, JSON.stringify(a));
+        }
+
+        function setSession(u) {
+            localStorage.setItem(K.U, JSON.stringify(u));
+            sessionStorage.setItem('aura_just_authed', '1');
+        }
+
+        let _toastT;
+
+        function toast(m, type = 'ok') {
+            const el = document.getElementById('aura-toast');
+            el.textContent = m;
+            el.className = 'aura-toast show ' + (type === 'err' ? 'aura-toast-err' : '');
+            clearTimeout(_toastT);
+            _toastT = setTimeout(() => el.classList.remove('show'), 3000);
+        }
+
+        function setMsg(id, txt, type = 'err') {
+            const el = document.getElementById(id);
+            el.textContent = txt;
+            el.className = 'msg ' + (type === 'ok' ? 'ok' : 'err');
+        }
+
+        function clearMsg(id) {
+            const el = document.getElementById(id);
+            el.textContent = '';
+            el.className = 'msg';
+        }
+
+        function setLoad(btn, on) {
+            btn.classList.toggle('loading', on);
+            if (on) {
+                btn._t = btn.textContent;
+                btn.textContent = 'Please wait…';
+            } else {
+                btn.textContent = btn._t || btn.textContent;
+            }
+        }
+
+        // ── Transition to app ─────────────────────────────────────
+        function goApp(user) {
+            setSession(user);
+            const card = document.getElementById('authCard');
+            card.style.transition = 'all .48s cubic-bezier(.22,1,.36,1)';
+            card.style.transform = 'scale(.9)';
+            card.style.opacity = '0';
+            setTimeout(() => window.location.href = 'index.html', 520);
+        }
+
+        // ── Slide logic ───────────────────────────────────────────
+        let mode = 'login';
+        const ovl = document.getElementById('ovl');
+        const ovlTitle = document.getElementById('ovlTitle');
+        const ovlSub = document.getElementById('ovlSub');
+        const ovlBtn = document.getElementById('ovlBtn');
+
+        function showSignup() {
+            mode = 'signup';
+            ovl.classList.add('left');
+            ovlTitle.innerHTML = 'Welcome<br>Back!';
+            ovlSub.innerHTML = 'Already have an account?<br>Sign in and keep writing. 🌊';
+            ovlBtn.textContent = 'SIGN IN';
+            clearMsg('sMsg');
+        }
+
+        function showLogin() {
+            mode = 'login';
+            ovl.classList.remove('left');
+            ovlTitle.innerHTML = 'Hello,<br>Friend!';
+            ovlSub.innerHTML = 'Welcome back. Your journal<br>is waiting for you. 🌸';
+            ovlBtn.textContent = 'SIGN UP';
+            clearMsg('lMsg');
+        }
+        ovlBtn.addEventListener('click', () => mode === 'login' ? showSignup() : showLogin());
+
+        // ══ EMAIL/PASSWORD AUTH ════════════════════════════════════
+
+        // Login
+        async function doLogin() {
+            const email = document.getElementById('lEmail').value.trim();
+            const pass = document.getElementById('lPass').value;
+            clearMsg('lMsg');
+            if (!email) {
+                setMsg('lMsg', '📧 Please enter your email.');
+                return;
+            }
+            if (!pass) {
+                setMsg('lMsg', '🔒 Please enter your password.');
+                return;
+            }
+            const btn = document.getElementById('loginBtn');
+            setLoad(btn, true);
+            const h = await sha256(pass);
+            const acc = getAcc();
+            const found = acc.find(a => a.email.toLowerCase() === email.toLowerCase());
+            if (!found) {
+                setLoad(btn, false);
+                setMsg('lMsg', '❌ No account with this email. Sign up first?');
+                return;
+            }
+            if (found.hash !== h) {
+                setLoad(btn, false);
+                setMsg('lMsg', '❌ Wrong password. Try again or reset it.');
+                return;
+            }
+            goApp({
+                name: found.name,
+                email: found.email,
+                photo: null,
+                uid: found.uid
+            });
+        }
+        document.getElementById('loginBtn').addEventListener('click', doLogin);
+        document.getElementById('lPass').addEventListener('keydown', e => {
+            if (e.key === 'Enter') doLogin();
+        });
+
+        // Signup
+        async function doSignup() {
+            const name = document.getElementById('sName').value.trim();
+            const email = document.getElementById('sEmail').value.trim();
+            const pass = document.getElementById('sPass').value;
+            clearMsg('sMsg');
+            if (!name) {
+                setMsg('sMsg', '👤 What should we call you?');
+                return;
+            }
+            if (!email) {
+                setMsg('sMsg', '📧 Enter your email.');
+                return;
+            }
+            if (!/\S+@\S+\.\S+/.test(email)) {
+                setMsg('sMsg', '📧 Enter a valid email address.');
+                return;
+            }
+            if (pass.length < 6) {
+                setMsg('sMsg', '🔒 Password needs 6+ characters.');
+                return;
+            }
+            const btn = document.getElementById('signupBtn');
+            setLoad(btn, true);
+            const acc = getAcc();
+            if (acc.find(a => a.email.toLowerCase() === email.toLowerCase())) {
+                setLoad(btn, false);
+                setMsg('sMsg', '⚠️ This email already has an account. Sign in instead.');
+                return;
+            }
+            const h = await sha256(pass);
+            const nu = {
+                uid: 'u_' + Date.now(),
+                name,
+                email,
+                hash: h
+            };
+            acc.push(nu);
+            setAcc(acc);
+            goApp({
+                name,
+                email,
+                photo: null,
+                uid: nu.uid
+            });
+        }
+        document.getElementById('signupBtn').addEventListener('click', doSignup);
+        document.getElementById('sPass').addEventListener('keydown', e => {
+            if (e.key === 'Enter') doSignup();
+        });
+
+        // ══ FIREBASE GOOGLE / FACEBOOK ════════════════════════════
+        // ─── PASTE YOUR FIREBASE CONFIG BELOW ────────────────────
+        // Get it from: console.firebase.google.com → Project Settings → Your Apps → Web
+        const firebaseConfig = {
+            apiKey: "AIzaSyA_HMMKQYrEikc4Ig8SXw87ROytzFYStP0",
+            authDomain: "aura-67702.firebaseapp.com",
+            projectId: "aura-67702",
+            storageBucket: "aura-67702.firebasestorage.app",
+            messagingSenderId: "652337209232",
+            appId: "1:652337209232:web:a580f4dd0c2619d112dd15",
+            measurementId: "G-1D2089T4Y8"
+        };
+        // ─────────────────────────────────────────────────────────
+
+        let fbAuth = null;
+        let fbReady = false;
+        (function() {
+            try {
+                if (!FIREBASE_CONFIG.apiKey.startsWith('YOUR_')) {
+                    if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+                    fbAuth = firebase.auth();
+                    fbReady = true;
+                }
+            } catch (e) {
+                console.warn('[AURA] Firebase init failed:', e.message);
+            }
+        })();
+
+        function handleFirebaseUser(u) {
+            if (!u) return;
+            goApp({
+                name: u.displayName || u.email.split('@')[0],
+                email: u.email,
+                photo: u.photoURL,
+                uid: u.uid
+            });
+        }
+
+        function firebaseErr(e) {
+            const map = {
+                'auth/popup-closed-by-user': 'Sign-in window was closed. Please try again.',
+                'auth/cancelled-popup-request': 'Please try again.',
+                'auth/account-exists-with-different-credential': 'This email is linked to a different sign-in method.',
+                'auth/network-request-failed': 'Network error. Check your connection.',
+            };
+            return map[e.code] || e.message || 'Something went wrong.';
+        }
+
+        async function socialLogin(provider) {
+            if (!fbReady) {
+                document.getElementById('fbGuideModal').classList.add('show');
+                return;
+            }
+            try {
+                const p = provider === 'google' ?
+                    new firebase.auth.GoogleAuthProvider() :
+                    new firebase.auth.FacebookAuthProvider();
+                const result = await fbAuth.signInWithPopup(p);
+                handleFirebaseUser(result.user);
+            } catch (e) {
+                const side = mode === 'login' ? 'lMsg' : 'sMsg';
+                setMsg(side, '❌ ' + firebaseErr(e));
+            }
+        }
+        document.getElementById('gLoginBtn').addEventListener('click', () => socialLogin('google'));
+        document.getElementById('fbLoginBtn').addEventListener('click', () => socialLogin('facebook'));
+        document.getElementById('gSignupBtn').addEventListener('click', () => socialLogin('google'));
+        document.getElementById('fbSignupBtn').addEventListener('click', () => socialLogin('facebook'));
+
+        // ── Firebase guide close ──────────────────────────────────
+        document.getElementById('fbGuideClose').addEventListener('click', () => {
+            document.getElementById('fbGuideModal').classList.remove('show');
+        });
+        document.getElementById('fbGuideModal').addEventListener('click', e => {
+            if (e.target === document.getElementById('fbGuideModal'))
+                document.getElementById('fbGuideModal').classList.remove('show');
+        });
+
+        // ══ FORGOT PASSWORD ════════════════════════════════════════
+        const fpModal = document.getElementById('fpModal');
+        document.getElementById('forgotBtn').addEventListener('click', () => {
+            document.getElementById('fpEmail').value = document.getElementById('lEmail').value;
+            clearMsg('fpMsg');
+            // Reset to initial state
+            document.getElementById('fpFields').innerHTML = `
+    <div class="neu-wrap">
+      <input class="neu-inp" type="email" id="fpEmail" placeholder="Your email address"/>
+      <svg class="ico" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 7 10-7"/></svg>
+    </div>
+    <button class="btn btn-grad" id="fpSend" style="width:100%;justify-content:center">FIND ACCOUNT</button>`;
+            document.getElementById('fpEmail').value = document.getElementById('lEmail').value;
+            document.getElementById('fpSend').addEventListener('click', doReset);
+            document.getElementById('fpEmail').addEventListener('keydown', e => {
+                if (e.key === 'Enter') doReset();
+            });
+            fpModal.classList.add('show');
+            setTimeout(() => document.getElementById('fpEmail').focus(), 350);
+        });
+        document.getElementById('fpClose').addEventListener('click', () => fpModal.classList.remove('show'));
+        fpModal.addEventListener('click', e => {
+            if (e.target === fpModal) fpModal.classList.remove('show');
+        });
+
+        async function doReset() {
+            const email = document.getElementById('fpEmail').value.trim();
+            clearMsg('fpMsg');
+            if (!email) {
+                setMsg('fpMsg', '📧 Enter your email address.');
+                return;
+            }
+            if (!/\S+@\S+\.\S+/.test(email)) {
+                setMsg('fpMsg', '📧 Enter a valid email address.');
+                return;
+            }
+
+            // If Firebase ready → send real reset email
+            if (fbReady && fbAuth) {
+                const btn = document.getElementById('fpSend');
+                setLoad(btn, true);
+                try {
+                    await fbAuth.sendPasswordResetEmail(email);
+                    setLoad(btn, false);
+                    setMsg('fpMsg', '✅ Reset email sent! Check your inbox.', 'ok');
+                    setTimeout(() => {
+                        fpModal.classList.remove('show');
+                    }, 2500);
+                } catch (e) {
+                    setLoad(btn, false);
+                    setMsg('fpMsg', '❌ ' + firebaseErr(e));
+                }
+                return;
+            }
+
+            // Local mode → inline reset
+            const btn = document.getElementById('fpSend');
+            setLoad(btn, true);
+            await new Promise(r => setTimeout(r, 600));
+            const acc = getAcc();
+            const found = acc.find(a => a.email.toLowerCase() === email.toLowerCase());
+            setLoad(btn, false);
+            if (!found) {
+                setMsg('fpMsg', '❌ No account found with this email.');
+                return;
+            }
+
+            setMsg('fpMsg', '✅ Account found! Set your new password below.', 'ok');
+            const wrap = document.getElementById('fpFields');
+            wrap.innerHTML = `
+    <div class="neu-wrap" style="margin-top:8px">
+      <input class="neu-inp" type="password" id="fpNew" placeholder="New password (6+ chars)"/>
+      <svg class="ico" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    </div>
+    <button class="btn btn-grad" id="fpConfirm" style="width:100%;justify-content:center;margin-top:10px">SET NEW PASSWORD</button>`;
+            document.getElementById('fpConfirm').addEventListener('click', async() => {
+                const np = document.getElementById('fpNew').value;
+                if (np.length < 6) {
+                    setMsg('fpMsg', '🔒 Password needs 6+ characters.');
+                    return;
+                }
+                const btn2 = document.getElementById('fpConfirm');
+                setLoad(btn2, true);
+                const h = await sha256(np);
+                const a2 = getAcc();
+                const idx = a2.findIndex(x => x.email.toLowerCase() === email.toLowerCase());
+                if (idx > -1) {
+                    a2[idx].hash = h;
+                    setAcc(a2);
+                }
+                setLoad(btn2, false);
+                setMsg('fpMsg', '✅ Password updated! Signing you in…', 'ok');
+                setTimeout(() => {
+                    fpModal.classList.remove('show');
+                    document.getElementById('lEmail').value = email;
+                    showLogin();
+                }, 2000);
+            });
+        }
+        // Initial fpSend listener
+        document.getElementById('fpSend').addEventListener('click', doReset);
+        document.getElementById('fpEmail').addEventListener('keydown', e => {
+            if (e.key === 'Enter') doReset();
+        });
+    </script>
+</body>
+
+</html>
