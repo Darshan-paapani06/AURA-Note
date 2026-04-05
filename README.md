@@ -12,7 +12,7 @@
      ANIMATED TYPING TAGLINE
 ═══════════════════════════════════════════════ -->
 
-[![Typing SVG](https://readme-typing-svg.demolab.com?font=Playfair+Display&weight=700&size=28&pause=1200&color=1AB8D4&center=true&vCenter=true&width=700&lines=Your+Personal+Journal+App+%F0%9F%8C%8A;Write.+Feel.+Grow.+%F0%9F%8C%B8;Neumorphic+%C2%B7+Calm+%C2%B7+Powerful+%F0%9F%92%99;Built+with+Soul+in+April+2026+%E2%9C%A8)](https://github.com/ddj)
+[![Typing SVG](https://readme-typing-svg.demolab.com?font=Playfair+Display&weight=700&size=28&pause=1200&color=1AB8D4&center=true&vCenter=true&width=700&lines=Your+Personal+Journal+App+%F0%9F%8C%8A;Write.+Feel.+Grow.+%F0%9F%8C%B8;Neumorphic+%C2%B7+Calm+%C2%B7+Powerful+%F0%9F%92%99;Built+with+Soul+in+April+2026+%E2%9C%A8)](https://github.com/DarshanPaapani)
 
 <br/>
 
@@ -26,15 +26,33 @@
 
 ### ✦ Crafted by
 
-<img src="https://capsule-render.vercel.app/api?type=soft&color=gradient&customColorList=6,11,20&height=90&text=ddj&fontSize=40&fontColor=ffffff&fontAlign=50&fontAlignY=55&width=200" style="border-radius:50%"/>
+<img src="https://capsule-render.vercel.app/api?type=soft&color=gradient&customColorList=6,11,20&height=90&text=DarshanPaapani&fontSize=28&fontColor=ffffff&fontAlign=50&fontAlignY=55&width=360" style="border-radius:16px"/>
 
-## **ddj**
+## **DarshanPaapani**
 
-*Full-Stack Developer · UI/UX Enthusiast · April 2026*
+### *Creative Technologist*
 
-[![GitHub](https://img.shields.io/badge/GitHub-ddj-1ab8d4?style=for-the-badge&logo=github&logoColor=white&labelColor=2d4a5a)](https://github.com/ddj)
+<br/>
+
+> *"Zero frameworks. Zero shortcuts. Zero compromise.*
+> *Just skill, taste, and the refusal to be ordinary."*
+
+<br/>
+
+I don't write code. I craft experiences.
+While everyone else reaches for the nearest library, I reach for a blank file and a clear head.
+AURA isn't an app — it's proof that attention to detail changes everything.
+Every shadow, every animation, every sliding panel was placed with intention, refined with obsession.
+
+**Quiet confidence. Loud execution.**
+
+<br/>
+
+[![GitHub](https://img.shields.io/badge/GitHub-DarshanPaapani-1ab8d4?style=for-the-badge&logo=github&logoColor=white&labelColor=2d4a5a)](https://github.com/DarshanPaapani)
 &nbsp;
-[![Portfolio](https://img.shields.io/badge/Portfolio-AURA-1488CC?style=for-the-badge&logo=safari&logoColor=white&labelColor=2d4a5a)](https://github.com/ddj)
+[![AURA](https://img.shields.io/badge/Project-AURA-1488CC?style=for-the-badge&logo=safari&logoColor=white&labelColor=2d4a5a)](https://github.com/DarshanPaapani/aura)
+&nbsp;
+[![April 2026](https://img.shields.io/badge/April-2026-5ad8e8?style=for-the-badge&logoColor=white&labelColor=2d4a5a)](https://github.com/DarshanPaapani)
 
 </td>
 </tr>
@@ -710,7 +728,7 @@ git push origin feature/your-amazing-idea
 </div>
 
 ```
-MIT License — Copyright © 2026 ddj
+MIT License — Copyright © 2026 DarshanPaapani
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (AURA), to
@@ -739,13 +757,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
 
 <br/>
 
-[![Star on GitHub](https://img.shields.io/github/stars/ddj/aura?style=social)](https://github.com/ddj/aura)
+[![Star on GitHub](https://img.shields.io/github/stars/DarshanPaapani/aura?style=social)](https://github.com/DarshanPaapani/aura)
 &nbsp;
-[![Follow ddj](https://img.shields.io/github/followers/ddj?style=social&label=Follow%20ddj)](https://github.com/ddj)
+[![Follow DarshanPaapani](https://img.shields.io/github/followers/DarshanPaapani?style=social&label=Follow%20DarshanPaapani)](https://github.com/DarshanPaapani)
 
 <br/>
 
-*Built with 💙 by **ddj** · April 2026 · Pure HTML · CSS · JavaScript*
+*Built with 💙 by **DarshanPaapani** · April 2026 · Pure HTML · CSS · JavaScript*
 
 <br/>
 
