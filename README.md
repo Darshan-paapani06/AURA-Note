@@ -28,7 +28,7 @@
 
 <img src="https://capsule-render.vercel.app/api?type=soft&color=gradient&customColorList=6,11,20&height=90&text=DarshanPaapani&fontSize=28&fontColor=ffffff&fontAlign=50&fontAlignY=55&width=360" style="border-radius:16px"/>
 
-## **DarshanPaapani**
+
 
 ### *Creative Technologist*
 
